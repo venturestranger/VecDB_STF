@@ -71,19 +71,24 @@ Get the confidence level of a word-unit being present in the database:
 
 ```python
 print(api.confidence('Привет мир!'))
+# > 0.936233997
+
 print(api.confidence('Привет мир!', exact=False, confidence_threshold=0.5))
+# > True
 ```
 
 Find the most similar word-unit present in the database:
 
 ```python
 print(api.similar_str('Привет мир!'))
+# > Hello world!
 ```
 
 Get the index of the most similar word-unit present in the database:
 
 ```python
 print(api.similar_idx('Привет мир!'))
+# > 0
 ```
 
 ### Resetting the Index
