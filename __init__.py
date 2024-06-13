@@ -20,16 +20,16 @@ class VDB:
 	def load(self, file_name: str = None):
 		if file_name == None:
 			try:
-				with open(self.vocab_file, 'r') as file:
-					self.vocab = file.read().split('@#$')
+				with open(self.vocab_file, 'rb') as file:
+					self.vocab = pickle.load(file)
 				with open(self.index_file, 'rb') as file:
 					self.index = pickle.load(file)
 			except:
 				pass
 		else:
 			try:
-				with open(file_name.split('.')[0] + '.mmp', 'r') as file:
-					self.vocab = file.read().split('@#$')
+				with open(file_name.split('.')[0] + '.mmp', 'rb') as file:
+					self.vocab = pickle.load(file)
 				with open(file_name.split('.')[0] + '.idm', 'rb') as file:
 					self.index = pickle.load(file)
 			except:
@@ -38,13 +38,13 @@ class VDB:
 	# define API saving to the given file
 	def save(self, file_name: str = None):
 		if file_name == None:
-			with open(self.vocab_file, 'w') as file:
-				file.write('@#$'.join(self.vocab))
+			with open(self.vocab_file, 'wb') as file:
+				pickle.dump(self.vocab, file)
 			with open(self.index_file, 'wb') as file:
 				pickle.dump(self.index, file)
 		else:
-			with open(file_name.split('.')[0] + '.mmp', 'w') as file:
-				file.write('@#$'.join(self.vocab))
+			with open(file_name.split('.')[0] + '.mmp', 'wb') as file:
+				pickle.dump(self.vocab, file)
 			with open(file_name.split('.')[0] + '.idm', 'wb') as file:
 				pickle.dump(self.index, file)
 	
