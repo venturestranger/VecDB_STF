@@ -153,7 +153,3 @@ api.load('db.mmp')
 api.save()
 api.load()
 ```
-
-## License
-
-This project is licensed under the MIT License. See the LICENSE file for details.
