@@ -34,15 +34,8 @@ pip install sentence-transformers faiss numpy
 First, initialize the vector database with a configuration object that specifies the embedding model, vocabulary file, and index file:
 
 ```python
-from sentence_transformers import SentenceTransformer
-from faiss import IndexFlatL2
-import numpy as np
-import pickle
-
-class Config:
-EMBEDDING_MODEL = 'paraphrase-MiniLM-L6-v2'
-VOCAB_FILE = 'vocab.txt'
-INDEX_FILE = 'index.pkl'
+from VecDB_STF import VDB
+from VecDB_STF.config import Config
 
 api = VDB(Config)
 ```
@@ -154,8 +147,11 @@ api.reset_index()
 
 # Save and load the database
 api.save('db.mmp')
-api.save()
 api.load('db.mmp')
+
+# Save and load the database by a default path
+api.save()
+api.load()
 ```
 
 ## License
