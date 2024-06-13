@@ -1,4 +1,4 @@
-# Vector Database API
+# Vector Database (VecDB) API
 
 This repository contains the implementation of a vector database API using the SentenceTransformer model for embeddings and FAISS for fast similarity search. The API allows for adding, removing, and querying word-units in a vector space, providing functionalities such as similarity search and confidence levels.
 
