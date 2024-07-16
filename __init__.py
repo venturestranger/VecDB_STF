@@ -1,6 +1,6 @@
 from sentence_transformers import SentenceTransformer, util
-from config import Config
-from annoy import AnnoyIndex
+from deep_translator import GoogleTranslator
+from .config import Config
 from faiss import IndexFlatL2
 import numpy as np
 import pickle
@@ -14,6 +14,8 @@ class VDB:
 		self.vocab_file = config.VOCAB_FILE
 		self.index_file = config.INDEX_FILE
 		self.index = IndexFlatL2(self.model.encode('hello').shape[-1])
+		self.translator = GoogleTranslator(source='auto', target='en')
+		self.vocab_nontranslated = []
 		self.vocab = []
 	
 	# define API loading from given files
@@ -22,6 +24,8 @@ class VDB:
 			try:
 				with open(self.vocab_file, 'rb') as file:
 					self.vocab = pickle.load(file)
+				with open(self.vocab_file + 't', 'rb') as file:
+					self.vocab_nontranslated = pickle.load(file)
 				with open(self.index_file, 'rb') as file:
 					self.index = pickle.load(file)
 			except:
@@ -30,6 +34,8 @@ class VDB:
 			try:
 				with open(file_name.split('.')[0] + '.mmp', 'rb') as file:
 					self.vocab = pickle.load(file)
+				with open(file_name.split('.')[0] + '.mmpt', 'rb') as file:
+					self.vocab_nontranslated = pickle.load(file)
 				with open(file_name.split('.')[0] + '.idm', 'rb') as file:
 					self.index = pickle.load(file)
 			except:
@@ -40,11 +46,15 @@ class VDB:
 		if file_name == None:
 			with open(self.vocab_file, 'wb') as file:
 				pickle.dump(self.vocab, file)
+			with open(self.vocab_file + 't', 'wb') as file:
+				pickle.dump(self.vocab_nontranslated, file)
 			with open(self.index_file, 'wb') as file:
 				pickle.dump(self.index, file)
 		else:
 			with open(file_name.split('.')[0] + '.mmp', 'wb') as file:
 				pickle.dump(self.vocab, file)
+			with open(file_name.split('.')[0] + '.mmpt', 'wb') as file:
+				pickle.dump(self.vocab_nontranslated, file)
 			with open(file_name.split('.')[0] + '.idm', 'wb') as file:
 				pickle.dump(self.index, file)
 	
@@ -57,7 +67,9 @@ class VDB:
 	
 	# define adding a new word-unit into the database
 	def add(self, note: str):
-		self.vocab.append(note)
+		self.vocab.append(self.translator.translate(note))
+		self.vocab_nontranslated.append(note)
+
 		self.index.add(np.expand_dims(self.model.encode(note), 0))
 	
 	# define removing word-units by index \ words
@@ -65,12 +77,14 @@ class VDB:
 		if type(idx) == int:
 			note = self.vocab[idx]
 			self.vocab = self.vocab[:idx] + self.vocab[idx+1:]
+			self.vocab_nontranslated = self.vocab_nontranslated[:idx] + self.vocab_nontranslated[idx+1:]
 		else:
 			note = idx
-			idx = self.vocab.index(idx)
+			idx = self.vocab_nontranslated.index(idx)
 
 			if idx != None:
 				self.vocab = self.vocab[:idx] + self.vocab[idx+1:]
+				self.vocab_nontranslated = self.vocab_nontranslated[:idx] + self.vocab_nontranslated[idx+1:]
 
 		self.index.remove_ids(self.index.search(np.expand_dims(self.model.encode(note), 0), 1)[1][0])
 	
