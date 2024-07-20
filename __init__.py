@@ -97,6 +97,7 @@ class VDB:
 	# return confidence level the given word-unit is present in the database
 	def confidence(self, note: str, exact: bool = True, confidence_threshold: float = 0.7) -> float | bool:
 		idx = self._sim(note)
+		note = self.translator.translate(note)
 
 		if exact:
 			return float(util.cos_sim(self.model.encode(note), self.model.encode(self.vocab[idx])).squeeze())
