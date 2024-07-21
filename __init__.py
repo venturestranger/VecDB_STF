@@ -1,9 +1,4 @@
-from sentence_transformers import SentenceTransformer, util
-from deep_translator import GoogleTranslator
-from faiss import IndexFlatL2
 from fastapi import FastAPI
-import numpy as np
-import pickle
 import threading
 import requests
 
@@ -15,10 +10,18 @@ else:
 # Vector database API
 class VDB:
 	# define initialization function 
-	def __init__(self, config):
+	def __init__(self, config, online: bool = False):
 		self.config = config
+		print(self.is_server_up())
 
-		if self.is_server_up() == False:
+		if self.is_server_up() == False and online != True:
+			print('Offline')
+			from sentence_transformers import SentenceTransformer, util
+			from deep_translator import GoogleTranslator
+			from faiss import IndexFlatL2
+			import numpy as np
+			import pickle
+
 			self.model = SentenceTransformer(config.EMBEDDING_MODEL)
 			self.vocab_file = config.VOCAB_FILE
 			self.index_file = config.INDEX_FILE
@@ -28,6 +31,7 @@ class VDB:
 			self.server.start()
 			self.server_is_online = False
 		else:
+			print('Online')
 			self.server_is_online = True
 
 		self.vocab = []
